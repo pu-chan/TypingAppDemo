@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>タイピングアプリ</title>
+        <style type="text/css">
+            /* モーダル画面 */
+            #close {
+                cursor: pointer;
+                width: 200px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                text-align: center;
+                padding: 12px 0;
+                margin: 16px auto 0;
+            }
+
+            #mask {
+                background: rgba(0, 0, 0, 0.6);
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                z-index: 1;
+            }
+
+            #mask.hidden {
+                display: none;
+            }
+
+            #modal {
+                background: #fff;
+                width: 320px;
+                height: 500px;
+                padding: 50px;
+                border-radius: 4px;
+                position: absolute;
+                top: 40px;
+                left: 0;
+                right: 0;
+                margin: 0 auto;
+                transition: 0.6s;
+                z-index: 3;
+            }
+
+            #modal.hidden {
+                transform: translate(0, -750px);
+            }
+
+           #modal .message01 {
+               font-weight: bold;
+               font-size: 40px;
+               margin-top: 10px;
+               margin-bottom: 0;
+           }
+
+           #modal .message02 {
+               font-size: 25px;
+               margin-top: 10px;
+               margin-bottom: 20px;
+           }
+
+           #modal .message03 {
+               font-weight: bold;
+               font-size: 40px;
+               margin-top: 20px;
+               margin-bottom: 20px;
+           }
+
+           #modal .message04 {
+               font-size: 15px;
+               margin-bottom: 15px;
+           }
+
+           /* チケットのダウンロード表示 */
+            #download {
+                position: absolute;
+                top: 200px;
+                left: 0;
+                right: 0;
+                margin: 0 auto;
+                z-index: 4;
+            }
+
+            #download.unshown {
+                display: none;
+           }
+
+            #download.down {
+                padding-top: 250px;
+                opacity: 0;
+                transition: 3s;
+           }
+
+            nav {
+                padding: 0;
+                margin: 0;
+                color: #fff;
+            }
+
+            nav ul {
+                list-style: none;
+                display: flex;
+                align-items: center;
+            }
+
+            #icon {
+                cursor: pointer;
+                margin-left: 0;
+            }
+
+            nav li {
+                margin-left: 100px;
+            }
+
+            body {
+                margin: 0;
+                font-family: Verdana, sans-serif;;
+                text-align: center;
+                background-repeat: no-repeat;
+            }
+
+            .roulette {
+                width: 350px;
+                height: 450px;
+                background-color: #fff;
+                margin: 0 auto 50px;
+                padding-top: 40px;
+                border-radius: 50px;
+            }
+
+            .out {
+                width: 250px;
+                height: 350px;
+                background: linear-gradient(180deg, #6495ed, #ee82ee);
+                overflow: hidden;
+                margin: 0px auto;
+            }
+
+            #outlineDeco {
+                width: 280px;
+                height: 350px;
+                overflow: hidden;
+                background-color: #a9a9a9;
+                margin: 0px auto;
+                padding: 15px 0;
+            }
+
+            #outlineDeco .outline .imageContainer {
+                width: 250px;
+                height: auto;
+                text-align: center;
+                margin: 80px auto;
+            }
+
+            #btn {
+                font-size: 30px;
+                color: #ffd700;
+                width: 45px;
+                height: 45px;
+                background-color: #00704a;
+                border-radius: 50%;
+                margin: 13px auto;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <!-- モーダル画面 -->
+    <div id="mask" class='hidden'></div>
+    <section id="modal" class='hidden'>
+        <p class='message01'>おめでとう!</p>
+        <p class='message02'>お楽しみチケット</p>
+        <img id='starbucksIcon01'>
+        <p class='message03'>500円分</p>
+        <p class='message04'>全国のstarbucksの店舗でお使いいただけます</p>
+        <p class='message04'>おつりは出ませんのでご了承下さい</p>
+        <div id="close">
+            チケットを受け取る
+        </div>
+    </section>
+    <!-- ダウンロード表示 -->
+    <div id='download' class='unshown'>
+        <img src='img/download02.png'>
+    </div>
+
+    <nav>
+        <ul>
+            <li id='icon'><img id='starbucksIcon02'></li>
+            <li>cafe</li>
+            <li>Coffee & Goods</li>
+            <li>Company</li>
+        </ul>
+    </nav>
+    <body>
+        <div class='roulette'>
+            <div id='outlineDeco'>
+                <div class = 'out'>
+                    <div class='outline'>
+                    </div>
+                </div>
+            </div>
+            <div id='btn' onclick="javascript:rouletteStart();">★</div>
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script src="js/jquery.easing.1.3.js"></script>
+    <script>
+        // ルーレット画像配列
+        const rouletteImg = [
+            'cake.png',
+            'cookie.png',
+            'donut.png',
+            'drink.png',
+            'drip.png'
+        ];
+        // 縦に並べるルーレット画像の数
+        const rouletteNum = 50;
+        // ルーレット画像のスタート位置
+        const startPos = -16005;
+        // ルーレット画像の停止位置
+        const stopPos = -1015;
+        // ルーレット移動の時間（ミリ秒）
+        const moveTime = 5000;
+        // 画像移動が始まっているか
+        let isMoved;
+
+        $(document).ready(function() {
+            // 枠内にルーレット画像を生成
+            rouletteCreate( $("#outlineDeco .outline") );
+        });
+
+        /* ルーレット画像生成 */
+        function rouletteCreate(obj){
+            // アニメーションをストップ（アニメーション処理中の場合の対応）
+            obj.stop(true, true);
+            // 枠内の要素をクリア
+            obj.children().remove();
+            
+            // ルーレット画像のタグ生成
+            for (let i = 1; i <= rouletteNum; i++) {
+                // 画像ファイルは配列からランダムに取得
+                const num = Math.floor(Math.random() * rouletteImg.length);
+                obj.append("<div class='imageContainer'>"
+                + "<img"
+                + " src='img/" + rouletteImg[num] + "'"
+                + " width='250' height='auto'/>"
+                + "</div>");
+            }
+            
+            // ルーレット画像のスタート位置を設定
+            obj.css({
+                "margin-top" : startPos + "px"
+            });
+        }
+
+        /* ルーレットスタート */
+        function rouletteStart(){
+            if(isMoved) {
+                return;
+            }
+            rouletteMove($("#outlineDeco .outline"));
+        }
+
+        // ルーレット画像移動
+        function rouletteMove(obj){
+            isMoved = true;
+            if (obj.css("margin-top") != startPos ){
+                // ルーレットが動いた後であれば、ルーレット画像を再作成
+                rouletteCreate( obj );
+            }
+            // ルーレット画像の移動アニメーション
+            obj.animate({
+                "margin-top" : stopPos + "px"
+            }, {
+                'duration' : moveTime,
+                'easing' : 'easeOutBounce',
+            });
+
+            setTimeout(() => {
+                callMordal();
+            }, moveTime + 1000);
+        }
+
+        // モーダル画面
+        const close = document.getElementById('close');
+
+        function callMordal() {
+            modal.classList.remove('hidden');
+            mask.classList.remove('hidden');
+            close.addEventListener('click', () => {
+                    setTimeout(() => {
+                        download.classList.remove('unshown');
+                    }, 300);
+                    setTimeout(() => {
+                        download.classList.add('down');
+                    }, 600);
+                    isMoved = false;
+                    setTimeout(() => {
+                        location.href = "index.html";
+                    }, 5000);
+            });
+        }
+
+        // ダウンロード
+        const download = document.getElementById('download');
+
+        // window画面デザイン
+        const body = document.querySelector('body');
+        body.style.backgroundImage = 'url(img/roulette01.jpg)';
+        body.style.backgroundSize = 'cover';
+        const  starbucksIcon01 =  document.getElementById('starbucksIcon01');
+        const  starbucksIcon02 =  document.getElementById('starbucksIcon02');
+        starbucksIcon01.src = 'img/icon01.png';
+        starbucksIcon02.src = 'img/icon01.png';
+
+        starbucksIcon01.addEventListener('mouseover', () => {
+            starbucksIcon01.src = 'img/icon02.png';
+        });
+        
+        starbucksIcon01.addEventListener('mouseout', () => {
+            starbucksIcon01.src = 'img/icon01.png';
+        });
+
+        starbucksIcon02.addEventListener('mouseover', () => {
+            starbucksIcon02.src = 'img/icon02.png';
+        });
+        
+        starbucksIcon02.addEventListener('mouseout', () => {
+            starbucksIcon02.src = 'img/icon01.png';
+        });
+    </script>
+    </body>
+</html>

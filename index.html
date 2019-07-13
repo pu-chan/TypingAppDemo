@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>タイピングゲーム</title>
+    <link rel='stylesheet' href='css/styles.css'>
+</head>
+    <!-- モーダル画面 -->
+    <div id="mask" class='hidden'></div>
+    <section id="modal" class='hidden'>
+        <p id='modalMessage'></p>
+        <div id="close">
+            Touch & Close
+        </div>
+    </section>
+
+    <div id="mask_a" class='hidden'></div>
+    <section id="modal_a" class='hidden'>
+        <p id='modal_aMessage'></p>
+        <a href='roulette.html' id="close_a">
+            ルーレットをまわす
+        </a>
+    </section>
+
+<nav>
+    <ul>
+        <li id='icon'><img></li>
+        <li>cafe</li>
+        <li>Coffee & Goods</li>
+        <li>Company</li>
+    </ul>
+</nav>
+<body>
+    <div id='container'>
+        <p id='target'></p>
+        <div class='info'>
+            <p>Left number of order : <span id='order'></span>drinks</p>  
+            <p class='info_item'>Left Time : <span id='timer'></span></p>
+        </div>
+    </div>
+<script src='js/main.js'></script>
+</body>
+</html>
